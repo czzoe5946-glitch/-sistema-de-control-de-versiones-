@@ -1,113 +1,122 @@
-import os
-import shutil
-import json
-from datetime import datetime
+import 'package:flutter/material.dart';
 
-# Carpeta donde se almacenarán las versiones
-VCS_DIR = ".vcs"
-COMMITS_FILE = os.path.join(VCS_DIR, "commits.json")
+void main() {
+  runApp(const MyApp());
+}
 
-def init():
-    """Inicializa el sistema de control de versiones."""
-    if not os.path.exists(VCS_DIR):
-        os.mkdir(VCS_DIR)
-        with open(COMMITS_FILE, "w") as f:
-            json.dump([], f)
-        print("✅ Repositorio inicializado en la carpeta actual.")
-    else:
-        print("⚠️ Ya existe un repositorio en este directorio.")
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-def commit(filename, message):
-    """Guarda una nueva versión del archivo."""
-    if not os.path.exists(VCS_DIR):
-        print("❌ No hay repositorio inicializado. Ejecuta primero 'init'.")
-        return
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Widgets Flutter',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const ScaffoldExample(),
+    );
+  }
+}
 
-    if not os.path.exists(filename):
-        print(f"❌ El archivo '{filename}' no existe.")
-        return
+class ScaffoldExample extends StatelessWidget {
+  const ScaffoldExample({super.key});
 
-    # Cargar historial existente
-    with open(COMMITS_FILE, "r") as f:
-        commits = json.load(f)
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Widgets Básicos en Flutter')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column( // Column principal
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Column y Row:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
 
-    version_num = len(commits) + 1
-    version_file = os.path.join(VCS_DIR, f"{version_num}_{os.path.basename(filename)}")
+            const SizedBox(height: 10),
 
-    # Copiar el archivo como nueva versión
-    shutil.copy2(filename, version_file)
+            //Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                Text('Elemento 1'),
+                Text('Elemento 2'),
+                Text('Elemento 3'),
+              ],
+            ),
 
-    # Registrar el commit
-    commits.append({
-        "version": version_num,
-        "filename": filename,
-        "message": message,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    })
+            const SizedBox(height: 30),
 
-    with open(COMMITS_FILE, "w") as f:
-        json.dump(commits, f, indent=4)
+            const Text(
+              'Ejemplo de Stack:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
 
-    print(f"✅ Commit {version_num} guardado: {message}")
+            const SizedBox(height: 10),
 
-def log():
-    """Muestra el historial de commits."""
-    if not os.path.exists(COMMITS_FILE):
-        print("❌ No hay historial de commits.")
-        return
+            // Stack con Container
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 150,
+                  height: 150,
+                  color: Colors.blueAccent,
+                ),
+                Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.greenAccent,
+                ),
+                const Text(
+                  'Stack',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
 
-    with open(COMMITS_FILE, "r") as f:
-        commits = json.load(f)
+            const SizedBox(height: 30),
 
-    if not commits:
-        print("📭 No hay commits registrados todavía.")
-        return
+            const Text(
+              'Container personalizado:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
 
-    print("\n=== HISTORIAL DE COMMITS ===")
-    for c in commits:
-        print(f"Versión {c['version']}: '{c['message']}' ({c['timestamp']})")
-    print("=============================\n")
+            const SizedBox(height: 10),
 
-def restore(version):
-    """Restaura una versión anterior del archivo."""
-    if not os.path.exists(COMMITS_FILE):
-        print("❌ No hay commits para restaurar.")
-        return
-
-    with open(COMMITS_FILE, "r") as f:
-        commits = json.load(f)
-
-    for c in commits:
-        if c["version"] == version:
-            version_file = os.path.join(VCS_DIR, f"{version}_{os.path.basename(c['filename'])}")
-            shutil.copy2(version_file, c["filename"])
-            print(f"🔄 Versión {version} restaurada en '{c['filename']}'")
-            return
-
-    print(f"❌ No se encontró la versión {version}.")
-
-# === Programa principal ===
-def main():
-    print("=== Mini Sistema de Control de Versiones ===")
-    print("Comandos disponibles: init, commit <archivo> <mensaje>, log, restore <número>")
-    while True:
-        cmd = input("\n> ").strip().split(" ", 2)
-        if cmd[0] == "init":
-            init()
-        elif cmd[0] == "commit" and len(cmd) >= 3:
-            commit(cmd[1], cmd[2])
-        elif cmd[0] == "log":
-            log()
-        elif cmd[0] == "restore" and len(cmd) >= 2:
-            try:
-                restore(int(cmd[1]))
-            except ValueError:
-                print("❌ Número de versión inválido.")
-        elif cmd[0] in ("exit", "quit"):
-            print("👋 Saliendo del sistema...")
-            break
-        else:
-            print("⚙️ Comando no reconocido.")
-
-if __name__ == "__main__":
-    main()
+            //Container
+            Container(
+              width: double.infinity,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.orangeAccent,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.grey,
+                    blurRadius: 5,
+                    offset: Offset(2, 4),
+                  ),
+                ],
+              ),
+              alignment: Alignment.center,
+              child: const Text(
+                'Container con estilo',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
